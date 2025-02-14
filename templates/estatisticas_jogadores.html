@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas de Jogadores</title>
+    <style>
+        body {
+            font-family: "Cinzel", serif; /* Fonte temática estilo D&D */
+            background-color: #1c1c1c;
+            color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #d4af37; /* Dourado para o título */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-top: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #2a2a2a; /* Fundo mais escuro */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid #444; /* Bordas para tema medieval */
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+            color: #f4f4f4;
+        }
+        th {
+            background-color: #6b4226; /* Tom marrom medieval */
+            color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #3b3b3b;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px;
+        }
+        .back-button {
+            background-color: #6b4226;
+            color: #f4f4f4;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #d4af37; /* Dourado para destaque */
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #d4af37;
+            color: #1c1c1c;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Estatísticas de Jogadores</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do Jogador</th>
+                <th>Total de Personagens</th>
+                <th>Nível Médio dos Personagens</th>
+                <th>Total de Moedas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resultado in resultados %}
+            <tr>
+                <td>{{ resultado.nome_jogador }}</td>
+                <td>{{ resultado.total_personagens }}</td>
+                <td>{{ resultado.nivel_medio_personagens | round(2) }}</td>
+                <td>{{ resultado.total_moedas }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="button-container">
+        <a href="/" class="back-button">Voltar</a>
+    </div>
+</body>
+</html>

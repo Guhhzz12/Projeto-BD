@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogadores</title>
+    <style>
+        /* Estilo geral */
+        body {
+            background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Cinzel', serif;
+            color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 20px;
+        }
+
+        a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ff4500;
+        }
+
+        /* Botão de adicionar jogador */
+        .add-button, .nav-button {
+            display: block;
+            width: 250px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            box-shadow: 3px 3px 6px #000;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .add-button:hover, .nav-button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+
+        /* Tabela de jogadores */
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4b2b1c;
+            color: #f5f5dc;
+            box-shadow: 5px 5px 10px #000;
+        }
+
+        th, td {
+            border: 1px solid #4b2b1c;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #6b4226;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        td {
+            background: #3b2b24;
+        }
+
+        tr:hover td {
+            background: #4e3628;
+        }
+
+        /* Botões de ações */
+        .action-buttons a, .action-buttons button {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            color: #fff;
+            background: #6b4226;
+            border: 1px solid #4b2b1c;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .action-buttons a:hover, .action-buttons button:hover {
+            background: #a0522d;
+        }
+
+        .action-buttons button {
+            font-family: 'Cinzel', serif;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        /* Estilo do botão de exclusão */
+        .delete-button {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background: #ff4500;
+        }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #ffd700;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Gerenciador de Personagens</h1>
+
+    <!-- Botão de adicionar novo jogador -->
+    <a class="add-button" href="{{ url_for('novo_jogador') }}">Adicionar Novo Jogador</a>
+    
+    <!-- Botão de ver estatísticas de jogadores -->
+    <a class="nav-button" href="{{ url_for('estatisticas_jogadores') }}">Ver Estatísticas de Jogadores</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Preferência de Campanha</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for jogador in jogadores %}
+            <tr>
+                <td>{{ jogador.nome }}</td>
+                <td>{{ jogador.data_de_nascimento }}</td>
+                <td>{{ jogador.preferencia_de_campanha }}</td>
+                <td class="action-buttons">
+                    <a href="{{ url_for('listar_personagens', nome=jogador.nome) }}">Ver Personagens</a>
+                    <a href="{{ url_for('editar_jogador', nome=jogador.nome) }}">Editar</a>
+                    <button onclick="deletarJogador('{{ jogador.nome }}')" class="delete-button">Excluir</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <footer>
+        © 2025 Banco de Dados
+    </footer>
+
+    <script>
+        async function deletarJogador(nome) {
+            if (confirm("Tem certeza que deseja excluir este jogador?")) {
+                try {
+                    const response = await fetch(`/jogador/${nome}/deletar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(result.success);
+                        window.location.reload();
+                    } else {
+                        alert(result.error);
+                    }
+                } catch (error) {
+                    alert("Ocorreu um erro ao processar a solicitação. Tente novamente mais tarde.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

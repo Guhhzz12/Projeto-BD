@@ -1,0 +1,226 @@
+    <!DOCTYPE html>
+    <html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Editar Personagem</title>
+        <style>
+            body {
+                background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+                background-size: cover;
+                font-family: 'Cinzel', serif;
+                color: #f5f5dc;
+                margin: 0;
+                padding: 0;
+            }
+
+            h1 {
+                text-align: center;
+                font-size: 3em;
+                color: #ffd700;
+                text-shadow: 2px 2px 4px #000;
+                margin-top: 20px;
+            }
+
+            form {
+                width: 50%;
+                margin: 20px auto;
+                background: rgba(0, 0, 0, 0.8);
+                border: 2px solid #4b2b1c;
+                border-radius: 10px;
+                box-shadow: 5px 5px 10px #000;
+                padding: 20px;
+            }
+
+            label {
+                display: block;
+                margin: 10px 0 5px;
+                font-weight: bold;
+                color: #ffd700;
+            }
+
+            input[type="text"], input[type="number"], select {
+                width: 100%;
+                padding: 10px;
+                border: 2px solid #4b2b1c;
+                border-radius: 5px;
+                background: #3b2b24;
+                color: #f5f5dc;
+                font-size: 1em;
+                margin-bottom: 15px;
+            }
+
+            input:focus, select:focus {
+                outline: none;
+                border-color: #ffd700;
+            }
+
+            button {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                background: #6b4226;
+                border: 2px solid #4b2b1c;
+                border-radius: 8px;
+                color: #f5f5dc;
+                font-size: 1.2em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s, transform 0.2s;
+            }
+
+            button:hover {
+                background: #a0522d;
+                transform: scale(1.05);
+            }
+
+            a {
+                text-align: center;
+                display: block;
+                margin-top: 20px;
+                text-decoration: none;
+                color: #ffd700;
+                font-weight: bold;
+            }
+
+            a:hover {
+                color: #ff4500;
+            }
+
+            #mensagem {
+                display: none;
+                text-align: center;
+                margin: 10px 0;
+                font-weight: bold;
+            }
+
+            .imagem-personagem {
+                max-width: 150px;
+                max-height: 150px;
+                border-radius: 10px;
+                border: 2px solid #4b2b1c;
+            }
+        </style>
+        <script>
+            async function enviarFormulario(event) {
+                event.preventDefault(); // Impede o envio padrão do formulário
+
+                const form = event.target; // Obtém o formulário
+                const formData = new FormData(form); // Cria um objeto FormData
+                const jogadorNome = form.dataset.jogadorNome; // Obtém o nome do jogador
+
+                try {
+                    console.log("Enviando dados:", Object.fromEntries(formData.entries())); // Log dos dados enviados
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    console.log("Resposta recebida:", response); // Log da resposta
+
+                    if (!response.ok) {
+                        throw new Error(`Erro na requisição: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log("Resultado:", result); // Log do resultado
+
+                    // Exibe a mensagem de sucesso como um pop-up
+                    alert(result.success);
+
+                    // Ou exibe a mensagem na tela (opcional)
+                    const mensagemDiv = document.getElementById('mensagem');
+                    mensagemDiv.style.color = 'green';
+                    mensagemDiv.textContent = result.success;
+                    mensagemDiv.style.display = 'block';
+
+                } catch (error) {
+                    console.error("Erro ao processar a solicitação:", error); // Log do erro
+                    alert("Ocorreu um erro ao processar a solicitação. Tente novamente mais tarde.");
+                }
+            }
+
+            function adicionarClasse() {
+                const container = document.getElementById('classes-container');
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label for="classe_personagem">Classe:</label>
+                    <select name="nome_classe[]" required>
+                        <option value="" disabled selected>Selecione uma classe</option>
+                        {% for classe in classes %}
+                        <option value="{{ classe.nome }}">{{ classe.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="nivel_classe">Nível da Classe:</label>
+                    <input type="number" name="nivel_classe[]" min="1" required>
+                `;
+                container.appendChild(div);
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Editar Personagem</h1>
+
+        <div id="mensagem"></div>
+
+        <form method="POST" action="{{ url_for('editar_personagem', nome=jogador_nome, nome_personagem=personagem.nome_personagem) }}" onsubmit="enviarFormulario(event)" data-jogador-nome="{{ jogador_nome }}" enctype="multipart/form-data">
+            <label for="nome_personagem">Nome do Personagem:</label>
+            <input type="text" id="nome_personagem" name="nome_personagem" value="{{ personagem.nome_personagem }}" readonly>
+
+            <label for="nivel">Nível:</label>
+            <input type="number" id="nivel" name="nivel" value="{{ personagem.nivel }}" min="1" required>
+
+            <label for="moedas">Moedas:</label>
+            <input type="number" id="moedas" name="moedas" value="{{ personagem.moedas }}" min="0" required>
+
+            <label for="nome_raca">Raça:</label>
+            <select id="nome_raca" name="nome_raca" required>
+                <option value="" disabled>Selecione uma raça</option>
+                {% for raca in racas %}
+                <option value="{{ raca.nome }}" {% if personagem.nome_raca == raca.nome %}selected{% endif %}>
+                    {{ raca.nome }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Campo para editar a imagem -->
+            <label for="imagem">Imagem do Personagem:</label>
+            {% if personagem.imagem %}
+                <div>
+                    <img src="{{ url_for('imagem_personagem', nome_personagem=personagem.nome_personagem) }}" alt="Imagem do Personagem" class="imagem-personagem">
+                    <p>Imagem atual:</p>
+                </div>
+            {% else %}
+                <p>Nenhuma imagem cadastrada.</p>
+            {% endif %}
+            <input type="file" id="imagem" name="imagem" accept="image/*">
+
+            <div id="classes-container">
+                {% for pc in personagem.classes %}
+                <div>
+                    <label for="classe_personagem">Classe:</label>
+                    <select name="nome_classe[]" required>
+                        <option value="" disabled>Selecione uma classe</option>
+                        {% for classe in classes %}
+                        <option value="{{ classe.nome }}" {% if pc.nome_classe == classe.nome %}selected{% endif %}>
+                            {{ classe.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <label for="nivel_classe">Nível da Classe:</label>
+                    <input type="number" name="nivel_classe[]" value="{{ pc.nivel_classe }}" min="1" required>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" onclick="adicionarClasse()">Adicionar Classe</button>
+
+            <label for="id_criatura">ID da Criatura:</label>
+            <input type="number" id="id_criatura" name="id_criatura" value="{{ personagem.id_criatura }}" min="1" required>
+
+            <button type="submit">Salvar Alterações</button>
+        </form>
+
+        <a href="{{ url_for('listar_personagens', nome=jogador_nome) }}">Voltar</a>
+    </body>
+    </html>

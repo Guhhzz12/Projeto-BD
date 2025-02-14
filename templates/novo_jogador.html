@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Jogador</title>
+    <style>
+        /* Estilo geral */
+        body {
+            background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Cinzel', serif;
+            color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 20px;
+        }
+
+        form {
+            width: 50%;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4b2b1c;
+            border-radius: 10px;
+            box-shadow: 5px 5px 10px #000;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #4b2b1c;
+            border-radius: 5px;
+            background: #3b2b24;
+            color: #f5f5dc;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            color: #f5f5dc;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+
+        a {
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ff4500;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Adicionar Novo Jogador</h1>
+
+    <form method="POST" action="{{ url_for('novo_jogador') }}">
+        <label for="nome">Nome:</label>
+        <input type="text" name="nome" id="nome" placeholder="Digite o nome do jogador" required>
+
+        <label for="data_de_nascimento">Data de Nascimento:</label>
+        <input type="date" name="data_de_nascimento" id="data_de_nascimento" required>
+
+        <label for="preferencia_de_campanha">Preferência de Campanha:</label>
+        <input type="text" name="preferencia_de_campanha" id="preferencia_de_campanha" placeholder="Ex: Dungeon Crawl, Roleplay, etc." required>
+
+        <button type="submit">Adicionar Jogador</button>
+    </form>
+
+    <a href="{{ url_for('index') }}">Voltar</a>
+</body>
+</html>

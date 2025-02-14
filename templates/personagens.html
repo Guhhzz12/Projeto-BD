@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personagens de {{ jogador.nome }}</title>
+    <style>
+        /* Estilo geral */
+        body {
+            background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Cinzel', serif;
+            color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 20px;
+        }
+
+        a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ff4500;
+        }
+
+        /* Botões de navegação */
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            padding: 10px 15px;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            color: #f5f5dc;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .nav-button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+
+        /* Tabela de personagens */
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4b2b1c;
+            color: #f5f5dc;
+            box-shadow: 5px 5px 10px #000;
+        }
+
+        th, td {
+            border: 1px solid #4b2b1c;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #6b4226;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        td {
+            background: #3b2b24;
+        }
+
+        tr:hover td {
+            background: #4e3628;
+        }
+
+        /* Imagem do personagem */
+        .imagem-personagem {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 10px;
+            border: 2px solid #4b2b1c;
+        }
+
+        /* Botões de ação */
+        .action-buttons a, .action-buttons button {
+            margin: 5px;
+            padding: 5px 10px;
+            color: #fff;
+            background: #6b4226;
+            border: 1px solid #4b2b1c;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .action-buttons a:hover, .action-buttons button:hover {
+            background: #a0522d;
+        }
+
+        button {
+            border: none;
+            font-family: 'Cinzel', serif;
+        }
+
+        .delete-button {
+            background: #8b0000;
+        }
+
+        .delete-button:hover {
+            background: #ff4500;
+        }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #ffd700;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        async function deletarPersonagem(event, nome, nome_personagem) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            if (confirm("Tem certeza que deseja excluir este personagem?")) {
+                try {
+                    const response = await fetch(`/jogador/${nome}/personagem/deletar/${nome_personagem}`, {
+                        method: 'POST',
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // Exibe um pop-up de sucesso
+                        alert(result.success);
+
+                        // Recarrega a lista de personagens sem redirecionar
+                        window.location.reload();
+                    } else {
+                        alert(result.error);
+                    }
+                } catch (error) {
+                    alert("Ocorreu um erro ao processar a solicitação. Tente novamente mais tarde.");
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Personagens de {{ jogador.nome }}</h1>
+
+    <div class="navigation-buttons">
+        <a class="nav-button" href="{{ url_for('novo_personagem', nome=jogador.nome) }}">Adicionar Novo Personagem</a>
+        <a class="nav-button" href="{{ url_for('pagina_transferir_moedas', nome=jogador.nome, next=url_for('listar_personagens', nome=jogador.nome)) }}">Transferir Moedas</a>
+        <a class="nav-button" href="{{ url_for('index') }}">Voltar</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Classe(s)</th>
+                <th>Nível</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for personagem in personagens %}
+            <tr>
+                <td>
+                    {% if personagem.imagem %}
+                        <img src="{{ url_for('imagem_personagem', nome_personagem=personagem.nome_personagem) }}" alt="Imagem do Personagem" class="imagem-personagem">
+                    {% else %}
+                        Sem imagem
+                    {% endif %}
+                </td>
+                <td>{{ personagem.nome_personagem }}</td>
+                <td>
+                    {% if personagem.classes %}
+                        {% for pc in personagem.classes %}
+                            {{ pc.classe.nome }} (Nível {{ pc.nivel_classe }})<br>
+                        {% endfor %}
+                    {% else %}
+                        Sem classe
+                    {% endif %}
+                </td>
+                <td>{{ personagem.nivel }}</td>
+                <td class="action-buttons">
+                    <a href="{{ url_for('editar_personagem', nome=jogador.nome, nome_personagem=personagem.nome_personagem) }}">Editar</a>
+                    <form onsubmit="deletarPersonagem(event, '{{ jogador.nome }}', '{{ personagem.nome_personagem }}')" style="display:inline;">
+                        <button class="delete-button" type="submit">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <footer>
+        © 2025 Banco de Dados
+    </footer>
+</body>
+</html>

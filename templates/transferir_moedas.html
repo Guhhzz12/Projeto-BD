@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transferir Moedas</title>
+    <style>
+        /* Estilo geral */
+        body {
+            background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Cinzel', serif;
+            color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #4b2b1c;
+            border-radius: 10px;
+            box-shadow: 5px 5px 10px #000;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2em;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #4b2b1c;
+            border-radius: 5px;
+            background: #3b2b24;
+            color: #f5f5dc;
+            font-size: 1em;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #a0522d;
+            box-shadow: 0 0 10px #ffd700;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            color: #ffd700;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+
+        /* Botão de voltar */
+        .back-button {
+            display: block;
+            max-width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            color: #ffd700;
+            font-size: 1em;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .back-button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Transferir Moedas</h1>
+
+    <!-- Formulário -->
+    <form onsubmit="transferirMoedas(event)">
+        <label for="origem">Personagem de Origem:</label>
+        <input type="text" id="origem" name="origem" required>
+
+        <label for="destino">Personagem de Destino:</label>
+        <input type="text" id="destino" name="destino" required>
+
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" name="quantidade" required min="1">
+
+        <button type="submit">Transferir Moedas</button>
+    </form>
+
+    <!-- Botão de voltar -->
+    <a href="/jogador/{{ jogador.nome }}/personagens" class="back-button">Voltar</a>
+
+
+
+
+    <script>
+        async function transferirMoedas(event) {
+            event.preventDefault();
+
+            const origem = document.getElementById('origem').value.trim();
+            const destino = document.getElementById('destino').value.trim();
+            const quantidade = parseInt(document.getElementById('quantidade').value, 10);
+
+            if (!origem || !destino || isNaN(quantidade) || quantidade <= 0) {
+                alert("Por favor, preencha todos os campos corretamente.");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/transferir_moedas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ origem, destino, quantidade }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.success);
+                    window.location.reload(); // Recarrega a página para atualizar os dados
+                } else {
+                    alert(result.error);
+                }
+            } catch (error) {
+                alert("Ocorreu um erro ao processar a solicitação. Tente novamente mais tarde.");
+            }
+        }
+    </script>
+</body>
+</html>

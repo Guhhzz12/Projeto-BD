@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Novo Personagem</title>
+    <style>
+        /* Estilo geral */
+        body {
+            background: #1a1a1a url('https://www.wallpaperflare.com/static/1005/318/951/fantasy-dark-castle-medieval-wallpaper.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Cinzel', serif;
+            color: #f5f5dc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px #000;
+            margin-top: 20px;
+        }
+
+        form {
+            width: 50%;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4b2b1c;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        input[type="text"], input[type="number"], select, input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #4b2b1c;
+            border-radius: 5px;
+            background: #3b2b24;
+            color: #f5f5dc;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #6b4226;
+            border: 2px solid #4b2b1c;
+            border-radius: 8px;
+            color: #f5f5dc;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: #a0522d;
+            transform: scale(1.05);
+        }
+
+        a {
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ff4500;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        async function enviarFormulario(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.success);
+                    window.location.href = "{{ url_for('listar_personagens', nome=jogador.nome) }}";
+                } else {
+                    alert(result.error);
+                }
+            } catch (error) {
+                alert("Ocorreu um erro ao processar a solicitação. Tente novamente mais tarde.");
+            }
+        }
+
+        function adicionarClasse() {
+            const container = document.getElementById('classes-container');
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <label for="classe_personagem">Classe:</label>
+                <select name="nome_classe[]" required>
+                    <option value="" disabled selected>Selecione uma classe</option>
+                    <option value="Patrulheiro">Patrulheiro</option>
+                    <option value="Paladino">Paladino</option>
+                    <option value="Monge">Monge</option>
+                    <option value="Mago">Mago</option>
+                    <option value="Ladino">Ladino</option>
+                    <option value="Guerreiro">Guerreiro</option>
+                    <option value="Feiticeiro">Feiticeiro</option>
+                    <option value="Druida">Druida</option>
+                    <option value="Clérigo">Clérigo</option>
+                    <option value="Bárbaro">Bárbaro</option>
+                    <option value="Bruxo">Bruxo</option>
+                    <option value="Bardo">Bardo</option>
+                </select>
+                <label for="nivel_classe">Nível da Classe:</label>
+                <input type="number" name="nivel_classe[]" min="1" required>
+            `;
+            container.appendChild(div);
+        }
+    </script>
+</head>
+<body>
+    <h1>Criar Novo Personagem</h1>
+
+    <form method="POST" action="{{ url_for('novo_personagem', nome=jogador.nome) }}" onsubmit="enviarFormulario(event)" enctype="multipart/form-data">
+        <label for="nome_personagem">Nome do Personagem:</label>
+        <input type="text" id="nome_personagem" name="nome_personagem" placeholder="Digite o nome do personagem" required>
+
+        <label for="nivel">Nível:</label>
+        <input type="number" id="nivel" name="nivel" placeholder="Digite o nível do personagem" min="1" required>
+
+        <label for="moedas">Moedas:</label>
+        <input type="number" id="moedas" name="moedas" placeholder="Digite a quantidade de moedas" min="0" required>
+
+        <label for="nome_raca">Raça:</label>
+        <select id="nome_raca" name="nome_raca" required>
+            <option value="" disabled selected>Selecione uma raça</option>
+            {% for raca in racas %}
+            <option value="{{ raca.nome }}">{{ raca.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Campo para upload de imagem -->
+        <label for="imagem">Imagem do Personagem:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
+
+        <div id="classes-container">
+            <div>
+                <label for="classe_personagem">Classe:</label>
+                <select name="nome_classe[]" required>
+                    <option value="" disabled selected>Selecione uma classe</option>
+                    <option value="Patrulheiro">Patrulheiro</option>
+                    <option value="Paladino">Paladino</option>
+                    <option value="Monge">Monge</option>
+                    <option value="Mago">Mago</option>
+                    <option value="Ladino">Ladino</option>
+                    <option value="Guerreiro">Guerreiro</option>
+                    <option value="Feiticeiro">Feiticeiro</option>
+                    <option value="Druida">Druida</option>
+                    <option value="Clérigo">Clérigo</option>
+                    <option value="Bárbaro">Bárbaro</option>
+                    <option value="Bruxo">Bruxo</option>
+                    <option value="Bardo">Bardo</option>
+                </select>
+                <label for="nivel_classe">Nível da Classe:</label>
+                <input type="number" name="nivel_classe[]" min="1" required>
+            </div>
+        </div>
+
+        <button type="button" onclick="adicionarClasse()">Adicionar Classe</button>
+
+        <label for="id_criatura">ID da Criatura:</label>
+        <input type="number" id="id_criatura" name="id_criatura" placeholder="Digite o ID da criatura" required>
+
+        <button type="submit">Criar Personagem</button>
+    </form>
+
+    <a href="{{ url_for('listar_personagens', nome=jogador.nome) }}">Voltar</a>
+</body>
+</html>
